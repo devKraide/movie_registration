@@ -15,9 +15,9 @@ app.use(routes)
 
 database();
 
-app.use((error, request, response, next) =>  {
-  
-  if(error instanceof AppError){
+app.use((error, request, response, next) => {
+
+  if (error instanceof AppError) {
     return response.status(error.statusCode).json({
       status: "error",
       message: error.message
