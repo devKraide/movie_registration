@@ -1,4 +1,4 @@
-const {hash} = require('bcryptjs');
+const {hash, compare} = require('bcryptjs');
 const AppError = require('../utils/AppError')
 const sqliteConnection = require("../database/sqlite");
 
@@ -23,32 +23,50 @@ class UsersController {
 
 
   async update(request, response) {
-    const { name, email } = request.body
+    const { name, email, password, new_password } = request.body
     const { id } = request.params
 
     const database = await sqliteConnection()
     const user = await database.get("SELECT * FROM users WHERE id = (?)", [id])
 
     if(!user) {
-     throw new AppError("Usuário não encontrado")
+     throw new AppError("user not found", 404)
     }
 
     const userWithUpdatedEmail = await database.get("SELECT * FROM users WHERE email = (?)", [email])
 
-    if(userWithUpdatedEmail && userWithUpdatedEmail.id !== user.id) {
-     throw new AppError("Este e-mail já está em uso.")
+    if(userWithUpdatedEmail && userWithUpdatedEmail.id !== user.id) { //it means = if a user  with the email exists, and the id from this email is different from the user id that is being updated, it means that the email is already in use per another person.
+     throw new AppError("email already in use")
     }
 
     user.name = name
     user.email= email
 
+    if(new_password && !password) {
+      throw new AppError("current password is required to update the password")
+    }
+
+    if(new_password && password) {
+      const checkPassword = await compare(password, user.password)
+      
+      if(!checkPassword) {
+        throw new AppError("current password is incorrect")
+      }
+
+      user.password = await hash(new_password, 8);
+    }
+      
+
+      user.password = await hash(new_password, 8)
+
     await database.run(`
      UPDATE users SET
      name = ?,
      email = ?,
+     password = ?,
      updated_at = ?
      WHERE id = ?`, 
-     [user.name, user.email, new Date(), id]
+     [user.name, user.email, user.password, new Date(), id]
    )
 
     return response.status(201).json();
