@@ -1,4 +1,4 @@
-const {hash, compare} = require('bcryptjs');
+const { hash, compare } = require('bcryptjs');
 const AppError = require('../utils/AppError')
 const sqliteConnection = require("../database/sqlite");
 
@@ -6,7 +6,7 @@ class UsersController {
   async create(request, response) {
     const { name, email, password } = request.body;
 
-    const database = await sqliteConnection(); 
+    const database = await sqliteConnection();
 
     const checkUserExists = await database.get("SELECT * FROM users WHERE email = (?)", [email])
 
@@ -29,35 +29,34 @@ class UsersController {
     const database = await sqliteConnection()
     const user = await database.get("SELECT * FROM users WHERE id = (?)", [id])
 
-    if(!user) {
-     throw new AppError("user not found", 404)
+    if (!user) {
+      throw new AppError("user not found", 404)
     }
 
     const userWithUpdatedEmail = await database.get("SELECT * FROM users WHERE email = (?)", [email])
 
-    if(userWithUpdatedEmail && userWithUpdatedEmail.id !== user.id) { //it means = if a user  with the email exists, and the id from this email is different from the user id that is being updated, it means that the email is already in use per another person.
-     throw new AppError("email already in use")
+    if (userWithUpdatedEmail && userWithUpdatedEmail.id !== user.id) { //it means = if a user  with the email exists, and the id from this email is different from the user id that is being updated, it means that the email is already in use per another person.
+      throw new AppError("email already in use")
     }
 
-    user.name = name
-    user.email= email
+    user.name = name ?? user.name;
+    user.email = email ?? user.email;
 
-    if(new_password && !password) {
+    if (new_password && !password) {
       throw new AppError("current password is required to update the password")
     }
 
-    if(new_password && password) {
+
+    if (new_password && password) {
       const checkPassword = await compare(password, user.password)
-      
-      if(!checkPassword) {
+
+      if (!checkPassword) {
         throw new AppError("current password is incorrect")
       }
 
       user.password = await hash(new_password, 8);
     }
-      
 
-      user.password = await hash(new_password, 8)
 
     await database.run(`
      UPDATE users SET
@@ -65,12 +64,12 @@ class UsersController {
      email = ?,
      password = ?,
      updated_at = DATETIME('now')
-     WHERE id = ?`, 
-     [user.name, user.email, user.password, id]
-   )
+     WHERE id = ?`,
+      [user.name, user.email, user.password, id]
+    )
 
     return response.status(201).json();
-}
+  }
 }
 
 
