@@ -12,6 +12,10 @@ class NotesController {
       user_id
     })
 
+    if (rating > 5 || rating < 1 || !Number.isInteger(rating)) {
+      throw new Error("Rating must be an integer between 1 and 5")
+    }
+
     const tagsInsert = tags.map(name => {
       return {
         note_id,
@@ -24,6 +28,10 @@ class NotesController {
 
     response.json()
   }
+
+  
 }
+
+
 
 module.exports = NotesController
