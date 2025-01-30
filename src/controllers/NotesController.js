@@ -56,30 +56,29 @@ class NotesController {
     response.json(`Note (id = ${id}) deleted successfully`);
   }
 
- async index(request, response) {
+  async index(request, response) {
     const { user_id, title, rating } = request.query
 
-
-    if(rating) {
+    if (rating) {
       const notes = await knex("notes")
-      .select("id", "title", "description", "rating")
-      .where({ user_id, rating })
-      .whereLike("title", `%${title}%`)
-      .orderBy("title");
+        .select("id", "title", "description", "rating")
+        .where({ user_id, rating })
+        .whereLike("title", `%${title}%`)
+        .orderBy("title");
 
-    response.json(notes).status(201); 
+      response.json(notes).status(201);
     } else {
 
-    const notes = await knex("notes")
-      .select("id", "title", "description", "rating")
-      .where({ user_id})
-      .whereLike("title", `%${title}%`)
-      .orderBy("title");
+      const notes = await knex("notes")
+        .select("id", "title", "description", "rating")
+        .where({ user_id })
+        .whereLike("title", `%${title}%`)
+        .orderBy("title");
 
-    response.json(notes).status(201); 
+      response.json(notes).status(201);
 
-  }
-    
+    }
+
   }
 
 }
