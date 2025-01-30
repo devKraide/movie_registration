@@ -30,8 +30,8 @@ class NotesController {
   }
 
   async show(request, response) {
-    const { id } = request.params
-
+    const { id } = request.params;
+    
     const notes = await knex("notes")
       .select("notes.*")
       .where({ id });
