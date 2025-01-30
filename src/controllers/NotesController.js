@@ -29,7 +29,22 @@ class NotesController {
     response.json()
   }
 
-  
+  async show(request, response) {
+    const { id } = request.params
+
+    const notes = await knex("notes")
+      .select("notes.*")
+      .where({ id });
+
+    const tag = await knex("tags")
+      .select("tags.name")
+      .where({ note_id: id })
+
+    response.json({
+      ...notes,
+      tag
+    });
+  }
 }
 
 
