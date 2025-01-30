@@ -31,7 +31,7 @@ class NotesController {
 
   async show(request, response) {
     const { id } = request.params;
-    
+
     const notes = await knex("notes")
       .select("notes.*")
       .where({ id });
@@ -54,10 +54,20 @@ class NotesController {
       .del();
 
     response.json(`Note (id = ${id}) deleted successfully`);
-}
+  }
+
+ async index(request, response) {
+    const { user_id, title, rating } = request.query
+
+    const notes = await knex("notes")
+      .select("id", "title", "description", "rating")
+      .where({ user_id })
+      .orderBy("title");
+
+    response.json(notes)
+  }
 
 }
-
 
 
 module.exports = NotesController
