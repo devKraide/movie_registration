@@ -42,6 +42,10 @@ class UsersController {
     user.name = name ?? user.name;
     user.email = email ?? user.email;
 
+    if(!password){
+      throw new AppError("current password is required to update users data")
+    }
+
     if (new_password && !password) {
       throw new AppError("current password is required to update the password")
     }
