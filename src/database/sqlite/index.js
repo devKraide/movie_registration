@@ -1,7 +1,7 @@
 const sqlite3 = require("sqlite3");
-//driver para sqlite = versão 
+//driver para sqlite = version
 const sqlite = require("sqlite");
-//sqlite.open = abre a conexão com o banco de dados
+//sqlite.open = make connection with database
 const path = require("path");
 
 
