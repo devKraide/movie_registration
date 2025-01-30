@@ -61,36 +61,61 @@ class NotesController {
 
     let notes;
 
-    if (rating) {
+    if (tags && !rating) {
+      const filterTags = tags.split(",").map(tag => tag.trim())
+
+      notes = await knex("tags")
+        .select([
+          "notes.id",
+          "notes.title",
+          "notes.description",
+          "notes.rating"
+        ])
+        .where("notes.user_id", user_id)
+        .whereLike("title", `%${title}%`)
+        .whereIn("name", filterTags)
+        .innerJoin("notes", "tags.note_id", "notes.id")
+        .orderBy("notes.title")
+
+    } else 
+    if (rating && !tags) {
       notes = await knex("notes")
         .select("id", "title", "description", "rating")
         .where({ user_id, rating })
         .whereLike("title", `%${title}%`)
         .orderBy("title");
 
-    } else {
+    } else 
+    if (tags && rating) {
+      const filterTags = tags.split(",").map(tag => tag.trim())
 
+      notes = await knex("tags")
+        .select([
+          "notes.id",
+          "notes.title",
+          "notes.description",
+          "notes.rating"
+        ])
+        .where("notes.user_id", user_id)
+        .whereLike("title", `%${title}%`)
+        .whereIn("name", filterTags)
+        .where({ rating })
+        .innerJoin("notes", "tags.note_id", "notes.id")
+        .orderBy("notes.title")
+
+    } 
+    else {
       notes = await knex("notes")
         .select("id", "title", "description", "rating")
         .where({ user_id })
         .whereLike("title", `%${title}%`)
         .orderBy("title");
-
     }
 
-    if (tags) {
-      const filterTags = tags.split(",").map(tag => tag.trim())
-
-      notes = notes + await knex("notes")
-        .whereIn("name", filterTags)
-
-      response.json(notes)
-    } 
-
-    response.json(notes)
-
+    response.json(notes);
 
   }
+
 
 }
 
