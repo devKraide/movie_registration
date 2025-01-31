@@ -15,6 +15,19 @@ class TagsController {
 
 }
 
+async delete(request, response) {
+  const { id } = request.params;
+
+  const deleteTags = await knex('tags')
+    .where({ id })
+    .del();
+
+  if (deleteTags === 0) {
+    return response.status(404).json({ error: "tag not found" });
+  }
+
+  return response.status(204).send();
+}
 
 
 }
