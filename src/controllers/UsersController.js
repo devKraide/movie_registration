@@ -43,6 +43,10 @@ class UsersController {
       throw new AppError("email already in use")
     }
 
+    if (userWithUpdatedEmail && userWithUpdatedEmail.id === user.id) { 
+      throw new AppError("This email is already in use by this user ")
+    }
+
     user.name = name ?? user.name;
     user.email = email ?? user.email;
 
