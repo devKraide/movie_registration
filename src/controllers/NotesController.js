@@ -116,7 +116,6 @@ class NotesController {
 
   }
 
-
 }
 
 
