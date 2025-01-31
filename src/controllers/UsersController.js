@@ -8,6 +8,10 @@ class UsersController {
 
     const database = await sqliteConnection();
 
+    if (!name || !email || !password) {
+      throw new AppError("Missing parameters")
+    }
+
     const checkUserExists = await database.get("SELECT * FROM users WHERE email = (?)", [email])
 
     if (checkUserExists) {
