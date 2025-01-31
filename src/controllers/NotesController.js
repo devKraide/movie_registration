@@ -5,6 +5,16 @@ class NotesController {
     const { title, description, tags, rating } = request.body
     const { user_id } = request.params
 
+    if (!title || !description || !tags || !rating) {
+      return response.status(400).json({ error: "All fields are required" })
+    }
+
+    const user_id_exists = await knex("users").where({ id: user_id }).first()
+
+    if (!user_id_exists) {
+      return response.status(404).json({ error: "User not found" })
+    }
+    
     const [note_id] = await knex("notes").insert({
       title,
       description,
