@@ -64,8 +64,6 @@ class NotesController {
     if (tags && !rating) {
       const filterTags = tags.split(",").map(tag => tag.trim())
 
-      console.log(filterTags)
-
       notes = await knex("tags")
         .select([
           "notes.id",
@@ -80,7 +78,7 @@ class NotesController {
         .innerJoin("notes", "tags.note_id", "notes.id")
         .orderBy("notes.title")
 
-        console.log(filterTags)
+        console.log(notes)
 
     } else 
     if (rating && !tags) {
@@ -119,7 +117,25 @@ class NotesController {
         .orderBy("title");
     }
 
-    response.json(notes);
+    const userTags = await knex("tags").where({user_id})
+    const notesWithTags = notes.map(note => {
+      
+      const noteTags = userTags.filter(tag => tag.note_id === note.id)
+      
+      return {
+        ...note,
+        tags: noteTags.map(tag => {
+          return {
+          name: tag.name,
+          id: tag.id   
+          }     
+        }) 
+      }
+      
+    })  
+       
+
+    response.json(notesWithTags);
 
   }
 
