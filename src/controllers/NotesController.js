@@ -49,9 +49,13 @@ class NotesController {
   async delete(request, response) {
     const { id } = request.params
 
-    await knex("notes")
+    const deleteNotes = await knex("notes")
       .where({ id })
       .del();
+
+    if (deleteNotes === 0) {
+      return response.status(404).json({ error: "Note not found" });
+    }
 
     response.json(`Note (id = ${id}) deleted successfully`);
   }
